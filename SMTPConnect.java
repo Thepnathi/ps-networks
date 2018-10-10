@@ -4,13 +4,13 @@
  * Student-IDs:
  * Date:
  *************************************/
+
 import java.net.*;
 import java.io.*;
 import java.util.*;
 
 /**
  * Open an SMTP connection to mailserver and send one mail.
- *
  */
 public class SMTPConnect {
     /* The socket to the server */
@@ -30,68 +30,89 @@ public class SMTPConnect {
     public SMTPConnect(EmailMessage mailmessage) throws IOException {
         // Open a TCP client socket with hostname and portnumber specified in
         // mailmessage.DestHost and  mailmessage.DestHostPort, respectively.
-	connection = /* Fill in */;
-	
+        connection = new Socket(mailmessage.DestHost, mailmessage.DestHostPort);
+
         // attach the BufferedReader fromServer to read from the socket and
         // the DataOutputStream toServer to write to the socket
-        fromServer = /* Fill in */;
-	toServer =   /* Fill in */;
-	
-	/* Fill in */
-	/* Read one line from server and check that the reply code is 220.
-	   If not, throw an IOException. */
-	/* Fill in */
+        fromServer = new BufferedReader(
+                new InputStreamReader(connection.getInputStream()));
+        toServer = new DataOutputStream(connection.getOutputStream());
 
-	/* SMTP handshake. We need the name of the local machine.
+        /* Fill in */
+	    /* Read one line from server and check that the reply code is 220.
+	    If not, throw an IOException. */
+        // Create a BufferedReader to read a line at a time.
+        InputStream inputStream = connection.getInputStream();
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+        BufferedReader reader = new BufferedReader(inputStreamReader);
+
+        // Read greeting from the server.
+        String response = reader.readLine();
+        System.out.println(response);
+        if (!response.startsWith("220")) {
+            throw new IOException("220 reply not received from server.");
+        }
+
+        /* Fill in */
+	    /* SMTP handshake. We need the name of the local machine.
 	   Send the appropriate SMTP handshake command. */
-	String localhost = InetAddress.getLocalHost().getHostName();
-	sendCommand( /* Fill in */ );
+        String localhost = InetAddress.getLocalHost().getHostName();
+        sendCommand("HELLO " + localhost + CRLF, 250);
 
-	isConnected = true;
+        isConnected = true;
     }
 
     /* Send message. Write the correct SMTP-commands in the
        correct order. No checking for errors, just throw them to the
        caller. */
     public void send(EmailMessage mailmessage) throws IOException {
-	/* Fill in */
+        /* Fill in */
 	/* Send all the necessary commands to send a message. Call
 	   sendCommand() to do the dirty work. Do _not_ catch the
 	   exception thrown from sendCommand(). */
-	/* Fill in */
+        sendCommand("MAIL FROM: " + mailmessage.Sender + CRLF, 250);
+        sendCommand("ReCIPIENT TO: " + mailmessage.Recipient + CRLF, 250);
+        sendCommand("DATA" + CRLF, 354);
+        /* Fill in */
     }
 
     /* Close SMTP connection. First, terminate on SMTP level, then
        close the socket. */
     public void close() {
-	isConnected = false;
-	try {
-	    sendCommand( /* Fill in */ );
-	    connection.close();
-	} catch (IOException e) {
-	    System.out.println("Unable to close connection: " + e);
-	    isConnected = true;
-	}
+        isConnected = false;
+        try {
+            sendCommand("QUIT" + CRLF, 221);
+            connection.close();
+        } catch (IOException e) {
+            System.out.println("Unable to close connection: " + e);
+            isConnected = true;
+        }
     }
 
     /* Send an SMTP command to the server. Check that the reply code is
        what is is supposed to be according to RFC 821. */
     private void sendCommand(String command, int rc) throws IOException {
-	/* Fill in */
-	/* Write command to server and read reply from server. */
-	/* Fill in */
+        /* Fill in */
+        /* Write command to server and read reply from server. */
+        toServer.writeBytes(command + CRLF);
+        /* Fill in */
 
-	/* Fill in */
-	/* Check that the server's reply code is the same as the parameter
+        /* Fill in */
+	    /* Check that the server's reply code is the same as the parameter
 	   rc. If not, throw an IOException. */
-	/* Fill in */
+        String response = fromServer.readLine();
+
+        if (!response.startsWith(rc + "")) {
+            throw new IOException("The reply code is not the same as the rc");
+        }
+        /* Fill in */
     }
 
     /* Destructor. Closes the connection if something bad happens. */
     protected void finalize() throws Throwable {
-	if(isConnected) {
-	    close();
-	}
-	super.finalize();
+        if (isConnected) {
+            close();
+        }
+        super.finalize();
     }
 } 
