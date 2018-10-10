@@ -57,7 +57,8 @@ public class SMTPConnect {
 	    /* SMTP handshake. We need the name of the local machine.
 	   Send the appropriate SMTP handshake command. */
         String localhost = InetAddress.getLocalHost().getHostName();
-        sendCommand("HELLO " + localhost + CRLF, 250);
+        System.out.println("LOCALHOST: " + localhost);
+        sendCommand("HELO " + localhost + CRLF, 250);
 
         isConnected = true;
     }
@@ -71,8 +72,11 @@ public class SMTPConnect {
 	   sendCommand() to do the dirty work. Do _not_ catch the
 	   exception thrown from sendCommand(). */
         sendCommand("MAIL FROM: " + mailmessage.Sender + CRLF, 250);
-        sendCommand("ReCIPIENT TO: " + mailmessage.Recipient + CRLF, 250);
-        sendCommand("DATA" + CRLF, 354);
+        sendCommand("RCPT TO: " + mailmessage.Recipient + CRLF, 250);
+        sendCommand("DATA" + CRLF +
+                        mailmessage.Headers + CRLF +
+                        mailmessage.Body + CRLF +
+                        "." + CRLF, 354);
         /* Fill in */
     }
 
@@ -94,7 +98,7 @@ public class SMTPConnect {
     private void sendCommand(String command, int rc) throws IOException {
         /* Fill in */
         /* Write command to server and read reply from server. */
-        toServer.writeBytes(command + CRLF);
+        toServer.writeBytes(command);
         /* Fill in */
 
         /* Fill in */
@@ -102,6 +106,8 @@ public class SMTPConnect {
 	   rc. If not, throw an IOException. */
         String response = fromServer.readLine();
 
+        System.out.println("from server: " + response);
+        System.out.println("rc: " + rc);
         if (!response.startsWith(rc + "")) {
             throw new IOException("The reply code is not the same as the rc");
         }
