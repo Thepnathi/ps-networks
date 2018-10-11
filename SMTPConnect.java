@@ -73,10 +73,10 @@ public class SMTPConnect {
 	   exception thrown from sendCommand(). */
         sendCommand("MAIL FROM: " + mailmessage.Sender + CRLF, 250);
         sendCommand("RCPT TO: " + mailmessage.Recipient + CRLF, 250);
-        sendCommand("DATA" + CRLF +
-                        mailmessage.Headers + CRLF +
+        sendCommand("DATA" + CRLF, 354);
+        sendCommand(mailmessage.Headers + CRLF +
                         mailmessage.Body + CRLF +
-                        "." + CRLF, 354);
+                        "." + CRLF, 250);
         /* Fill in */
     }
 
