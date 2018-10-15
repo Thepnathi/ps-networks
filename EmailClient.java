@@ -169,22 +169,18 @@ public class EmailClient extends Frame {
 			/* Pass string from URL field to HTTPGet (trimmed);
 			   returned string is either requested object 
 			   or some error message. */
-/*********************************************
- * Uncomment this for part 2
- *********************************************
- HttpInteract request = new HttpInteract(urlField.getText().trim());
 
- // Send http request. Returned String holds object
- try {
- receivedText=request.send();
- }
- catch (IOException error) {
- messageText.setText("Downloading File failed.\r\nIOException: " + error);
- return;
- }
- // Change message text
- messageText.setText(receivedText);
- *******************************************/
+            HttpInteract request = new HttpInteract(urlField.getText().trim());
+
+            // Send http request. Returned String holds object
+            try {
+                receivedText = request.send();
+            } catch (IOException error) {
+                messageText.setText("Downloading File failed.\r\nIOException: " + error);
+                return;
+            }
+            // Change message text
+            messageText.setText(receivedText);
         }
     }
 

@@ -41,12 +41,13 @@ public class SMTPConnect {
         /* Fill in */
 	    /* Read one line from server and check that the reply code is 220.
 	    If not, throw an IOException. */
+
         // Create a BufferedReader to read a line at a time.
         InputStream inputStream = connection.getInputStream();
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
         BufferedReader reader = new BufferedReader(inputStreamReader);
 
-        // Read greeting from the server.
+        // check response code
         String response = reader.readLine();
         System.out.println(response);
         if (!response.startsWith("220")) {
@@ -75,8 +76,8 @@ public class SMTPConnect {
         sendCommand("RCPT TO: " + mailmessage.Recipient + CRLF, 250);
         sendCommand("DATA" + CRLF, 354);
         sendCommand(mailmessage.Headers + CRLF +
-                        mailmessage.Body + CRLF +
-                        "." + CRLF, 250);
+                mailmessage.Body + CRLF +
+                "." + CRLF, 250);
         /* Fill in */
     }
 

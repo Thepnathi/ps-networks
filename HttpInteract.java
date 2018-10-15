@@ -8,6 +8,9 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 
 /**
  * Class for downloading one object from http server.
@@ -32,12 +35,33 @@ public class HttpInteract {
          */
 
         /* Fill in */
+        URL urlObject;
+        try {
+            urlObject = new URL("http://" + url);
+        } catch (MalformedURLException e) {
+            System.out.println("Incorrect URL");
+            return;
+        }
+
+        host = urlObject.getHost();
+        path = urlObject.getPath();
+        if (path == null) {
+            path = "/";
+        }
+
+        System.out.println("host: " + host);
+        System.out.println("path: " + path);
+
 
 
         /* Construct requestMessage, add a header line so that
          * server closes connection after one response. */
 
         /* Fill in */
+
+        requestMessage = "GET " + path + " HTTP/1.1\r\n"
+                + "Host: " + host + "\r\n"
+                + "\r\n";
 
         return;
     }
@@ -74,24 +98,28 @@ public class HttpInteract {
 
         /* Connect to http server on port 80.
          * Assign input and output streams to connection. */
-        connection = /* Fill in */;
-        fromServer = /* Fill in */;
-        toServer = /* Fill in */;
+        connection = new Socket(host, HTTP_PORT);
+        fromServer = new BufferedReader(
+                new InputStreamReader(connection.getInputStream()));
+        toServer = new DataOutputStream(connection.getOutputStream());
 
         System.out.println("Send request:\n" + requestMessage);
 
-
-        /* Send requestMessage to http server */
-        /* Fill in */
+        toServer.writeBytes(requestMessage);
+        toServer.flush();
 
         /* Read the status line from response message */
-        statusLine = /* Fill in */;
+        statusLine = fromServer.readLine();
         System.out.println("Status Line:\n" + statusLine + CRLF);
 
         /* Extract status code from status line. If status code is not 200,
          * close connection and return an error message.
          * Do NOT throw an exception */
         /* Fill in */
+        if (!statusLine.toLowerCase().contains("200")) {
+            connection.close();
+            throw new IOException("200 reply not received from server.");
+        }
 
         /* Read header lines from response message, convert to a string,
          * and assign to "headers" variable.
@@ -100,14 +128,33 @@ public class HttpInteract {
          * header line, if present, and assign to "bodyLength" variable.
          */
         /* Fill in */        // requires about 10 lines of code
+        String line;
+        while ((line = fromServer.readLine()) != null) {
+            if (line.isEmpty()) {
+                break;
+            }
+
+            if (line.toLowerCase().contains("content-length")) {
+                // extract numbers from line
+                Pattern p = Pattern.compile("-?\\d+");
+                Matcher m = p.matcher(line);
+                // conert string to integer
+                while (m.find()) {
+                    bodyLength = Integer.parseInt(m.group());
+                }
+            }
+
+            headers += line + CRLF;
+        }
         System.out.println("Headers:\n" + headers + CRLF);
 
 
         /* If object is larger than MAX_OBJECT_SIZE, close the connection and
          * return meaningful message. */
-        if (/* Fill in */) {
-            /* Fill in */
-            return (/* Fill in */ +bodyLength);
+        /* Fill in */
+        if (bodyLength > MAX_OBJECT_SIZE) {
+            connection.close();
+            return ("Requested object is too large. Object size = " + bodyLength);
         }
 
         /* Read the body in chunks of BUF_SIZE using buf[] and copy the chunk
@@ -120,8 +167,23 @@ public class HttpInteract {
         int bytesRead = 0;
 
         /* Fill in */   // Requires 10-20 lines of code
+        while (bytesRead < MAX_OBJECT_SIZE) {
+            int numOfCharsRead = fromServer.read(buf, 0, BUF_SIZE);
+            if (numOfCharsRead == -1) {
+                // end of stream has been reached; read() returns -1
+                break;
+            }
+            // Copy buffer into body
+            for (int i = 0; i < numOfCharsRead && (i + bytesRead) < MAX_OBJECT_SIZE; i++) {
+                body[bytesRead + i] = buf[i];
+            }
 
-        /* At this points body[] should hold to body of the downloaded object and
+            // 1 char takes up 1 byte
+            bytesRead += numOfCharsRead;
+        }
+
+
+        /* At this point body[] should hold to body of the downloaded object and
          * bytesRead should hold the number of bytes read from the BufferedReader
          */
 
