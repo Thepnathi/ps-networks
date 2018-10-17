@@ -34,6 +34,7 @@ public class EmailMessage {
         /* Remove whitespace */
         Sender = from.trim();
         Recipient = to.trim();
+        
 
         Headers = "From: " + Sender + CRLF;
         Headers += "To: " + Recipient + CRLF;

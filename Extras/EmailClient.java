@@ -14,15 +14,27 @@ public class EmailClient extends Frame {
     private Button btClear = new Button("Clear");
     private Button btQuit = new Button("Quit");
     private Label serverLabel = new Label("Local SMTP server:");
-    private TextField serverField = new TextField("student.csc.liv.ac.uk", 40);
+    /** 
+     * Testing - Remove once complete
+     * serverField back to "student.csc.liv.ac.uk"
+     */
+    private TextField serverField = new TextField("localhost", 40);
     private Label serverPortLabel = new Label("Port number of SMTP server:");
     private TextField serverPortField = new TextField("1025", 30);
     private Label fromLabel = new Label("From:");
-    private TextField fromField = new TextField("", 40);
+    /** 
+     * Testing - Remove once complete
+     * fromField
+     * toField
+     * subjectField
+     */
+    private TextField fromField = new TextField("user@mail.co.uk", 40);
     private Label toLabel = new Label("To:");
-    private TextField toField = new TextField("", 40);
+    private Label ccLabel = new Label("CC: ");
+    private TextField toField = new TextField("recipient@mail.com", 40);
+    private TextField ccField = new TextField("recipeint2@mail.com", 40);
     private Label subjectLabel = new Label("Subject:");
-    private TextField subjectField = new TextField("", 40);
+    private TextField subjectField = new TextField("A Big Vegetable Burger!", 40);
     private Label messageLabel = new Label("Message:");
     private TextArea messageText = new TextArea(30, 80);
     private Label urlLabel = new Label("HTTP://");
@@ -42,6 +54,7 @@ public class EmailClient extends Frame {
         Panel serverPortPanel = new Panel(new BorderLayout());
         Panel fromPanel = new Panel(new BorderLayout());
         Panel toPanel = new Panel(new BorderLayout());
+        Panel ccPanel = new Panel(new BorderLayout());
         Panel subjectPanel = new Panel(new BorderLayout());
         Panel messagePanel = new Panel(new BorderLayout());
         serverPanel.add(serverLabel, BorderLayout.WEST);
@@ -52,6 +65,8 @@ public class EmailClient extends Frame {
         fromPanel.add(fromField, BorderLayout.CENTER);
         toPanel.add(toLabel, BorderLayout.WEST);
         toPanel.add(toField, BorderLayout.CENTER);
+        ccPanel.add(ccLabel, BorderLayout.WEST);
+        ccPanel.add(ccField, BorderLayout.CENTER);
         subjectPanel.add(subjectLabel, BorderLayout.WEST);
         subjectPanel.add(subjectField, BorderLayout.CENTER);
         messagePanel.add(messageLabel, BorderLayout.NORTH);
@@ -61,6 +76,7 @@ public class EmailClient extends Frame {
         fieldPanel.add(serverPortPanel);
         fieldPanel.add(fromPanel);
         fieldPanel.add(toPanel);
+        fieldPanel.add(ccPanel);
         fieldPanel.add(subjectPanel);
 		
 	/* Create a panel for the URL field and add listener to the GET 
@@ -128,8 +144,9 @@ public class EmailClient extends Frame {
             try {
                 mailMessage = new EmailMessage(fromField.getText(),
                         toField.getText(),
+                        ccField.getText(),
                         subjectField.getText(),
-                        messageText.getText(),
+                        messageText.getText(), 
                         serverField.getText(),
                         Integer.parseInt(serverPortField.getText()));
             } catch (UnknownHostException e) {
@@ -191,6 +208,7 @@ public class EmailClient extends Frame {
             System.out.println("Clearing fields");
             fromField.setText("");
             toField.setText("");
+            ccField.setText("");
             subjectField.setText("");
             messageText.setText("");
         }

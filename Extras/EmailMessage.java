@@ -5,6 +5,7 @@
 import java.util.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.cert.CRL;
 import java.text.*;
 
 public class EmailMessage {
@@ -12,6 +13,7 @@ public class EmailMessage {
     public String Sender;
     /* SMTP-recipient, or contents of To-header. */
     public String Recipient;
+    public String CC;
     /* Target MX-host */
     public String DestHost;
     private InetAddress DestAddr;
@@ -29,14 +31,16 @@ public class EmailMessage {
      * Create the message object by inserting the required headers from RFC 822
      * (From, To, Date).
      */
-    public EmailMessage(String from, String to, String subject, String text,
+    public EmailMessage(String from, String to, String cc, String subject, String text,
                         String localServer, int localServerPort) throws UnknownHostException {
         /* Remove whitespace */
         Sender = from.trim();
         Recipient = to.trim();
+        CC = cc.trim();
 
         Headers = "From: " + Sender + CRLF;
         Headers += "To: " + Recipient + CRLF;
+        Headers += "CC: " + CC + CRLF;
         Headers += "Subject: " + subject.trim() + CRLF;
 
         /*
@@ -74,6 +78,7 @@ public class EmailMessage {
     public boolean isValid() {
         int fromat = Sender.indexOf('@');
         int toat = Recipient.indexOf('@');
+        int ccToat = CC.indexOf('@');
 
         if (fromat < 1 || (Sender.length() - fromat) <= 1) {
             System.out.println("Sender address is invalid");
@@ -81,6 +86,11 @@ public class EmailMessage {
         }
         if (toat < 1 || (Recipient.length() - toat) <= 1) {
             System.out.println("Recipient address is invalid");
+            return false;
+        }
+        if (CC.length() > 0 && ccToat < 1 || (CC.length() - ccToat) <= 1) {
+            // If CC is not empty and it contains '@' symbol
+            System.out.println("CC address is invalid");
             return false;
         }
         if (fromat != Sender.lastIndexOf('@')) {
