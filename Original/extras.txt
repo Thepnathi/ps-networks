@@ -1,0 +1,20 @@
+Extras 
+
+
+Part 1 - Send to multiple recipient
+
+Description
+
+Allows the user to send the email to more than one user
+
+How to test
+
+
+Part 2 - Send a file to a recipient
+
+Description
+
+Allows user to send a file to a user. For example, a JPEG file
+
+How to test
+
