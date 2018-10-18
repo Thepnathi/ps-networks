@@ -62,7 +62,7 @@ public class EmailClient extends Frame {
         fieldPanel.add(fromPanel);
         fieldPanel.add(toPanel);
         fieldPanel.add(subjectPanel);
-		
+
 	/* Create a panel for the URL field and add listener to the GET 
 	   button. */
         Panel urlPanel = new Panel(new BorderLayout());

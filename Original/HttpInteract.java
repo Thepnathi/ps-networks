@@ -45,7 +45,7 @@ public class HttpInteract {
 
         host = urlObject.getHost();
         path = urlObject.getPath();
-        if (path == null) {
+        if (path == "") {
             path = "/";
         }
 
@@ -116,7 +116,7 @@ public class HttpInteract {
          * close connection and return an error message.
          * Do NOT throw an exception */
         /* Fill in */
-        if (!statusLine.toLowerCase().contains("200")) {
+        if (!(statusLine.toLowerCase().contains("200") || statusLine.toLowerCase().contains("301"))) {
             connection.close();
             throw new IOException("200 reply not received from server.");
         }
@@ -153,6 +153,7 @@ public class HttpInteract {
          * return meaningful message. */
         /* Fill in */
         if (bodyLength > MAX_OBJECT_SIZE) {
+            System.out.println("Object is too large");
             connection.close();
             return ("Requested object is too large. Object size = " + bodyLength);
         }
