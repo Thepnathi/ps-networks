@@ -45,7 +45,7 @@ public class HttpInteract {
 
         host = urlObject.getHost();
         path = urlObject.getPath();
-        if (path == null) {
+        if (path == "") {
             path = "/";
         }
 
@@ -72,7 +72,6 @@ public class HttpInteract {
      * otherwise return meaningful error message.
      * Don't catch Exceptions. EmailClient will handle them. */
     public String send() throws IOException {
-
         /* buffer to read object in 4kB chunks */
         char[] buf = new char[BUF_SIZE];
 
@@ -112,11 +111,32 @@ public class HttpInteract {
         statusLine = fromServer.readLine();
         System.out.println("Status Line:\n" + statusLine + CRLF);
 
+        if (statusLine == null) {
+            connection.close();
+            throw new IOException("No reply received from server.");
+        }
+
+        // check if it's a redirection
+        if (statusLine.toLowerCase().contains("301") || statusLine.toLowerCase().contains("302")) {
+            // extract new URL from the headers
+            String newURL;
+            String line;
+            while ((line = fromServer.readLine()) != null) {
+                if (line.toLowerCase().contains("location")) {
+                    newURL = line.split(" ")[1];
+                    System.out.println("Redirecting to: " + newURL);
+                    redirectToURL(newURL);
+                }
+            }
+            connection.close();
+            return this.send();
+        }
+
         /* Extract status code from status line. If status code is not 200,
          * close connection and return an error message.
          * Do NOT throw an exception */
         /* Fill in */
-        if (!statusLine.toLowerCase().contains("200")) {
+        if (!(statusLine.toLowerCase().contains("200"))) {
             connection.close();
             throw new IOException("200 reply not received from server.");
         }
@@ -135,13 +155,9 @@ public class HttpInteract {
             }
 
             if (line.toLowerCase().contains("content-length")) {
-                // extract numbers from line
-                Pattern p = Pattern.compile("-?\\d+");
-                Matcher m = p.matcher(line);
-                // conert string to integer
-                while (m.find()) {
-                    bodyLength = Integer.parseInt(m.group());
-                }
+                // extract content length from line
+                String numbersFromLine = line.split(" ")[1];
+                bodyLength = Integer.parseInt(numbersFromLine);
             }
 
             headers += line + CRLF;
@@ -153,6 +169,7 @@ public class HttpInteract {
          * return meaningful message. */
         /* Fill in */
         if (bodyLength > MAX_OBJECT_SIZE) {
+            System.out.println("Object is too large");
             connection.close();
             return ("Requested object is too large. Object size = " + bodyLength);
         }
@@ -191,5 +208,30 @@ public class HttpInteract {
         System.out.println("Done reading file. Closing connection.");
         connection.close();
         return (new String(body, 0, bytesRead));
+    }
+
+    private void redirectToURL(String url) {
+        URL urlObject;
+
+        try {
+            urlObject = new URL(url);
+        } catch (MalformedURLException e) {
+            System.out.println("Incorrect URL");
+            return;
+        }
+
+        host = urlObject.getHost();
+        path = urlObject.getPath();
+        if (path == "") {
+            path = "/";
+        }
+
+        System.out.println("Redirection host: " + host);
+        System.out.println("Redirection path: " + path);
+
+
+        requestMessage = "GET " + path + " HTTP/1.1\r\n"
+                + "Host: " + host + "\r\n"
+                + "\r\n";
     }
 }

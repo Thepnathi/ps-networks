@@ -5,15 +5,17 @@
 import java.util.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.cert.CRL;
 import java.text.*;
 
 public class EmailMessage {
     /* SMTP-sender of the message (in this case, contents of From-header. */
     public String Sender;
     /* SMTP-recipient, or contents of To-header. */
-    public String Recipient;
-    public String CC;
+    // EXTRA - CHANGED TO AN ARRAY
+    public String[] Recipient;
+    // EXTRA CC
+    public String[] Cc;
+    public boolean hasCc;
     /* Target MX-host */
     public String DestHost;
     private InetAddress DestAddr;
@@ -30,17 +32,50 @@ public class EmailMessage {
     /*
      * Create the message object by inserting the required headers from RFC 822
      * (From, To, Date).
+     * EXTRA ADDED Cc String
      */
     public EmailMessage(String from, String to, String cc, String subject, String text,
                         String localServer, int localServerPort) throws UnknownHostException {
+
+        if (cc != null) {
+            Cc = cc.split(";");
+            hasCc = true;
+        } else {
+            hasCc = false;
+        }
+
+        // GET ARRAY OF RECEPENTS AND CCs
+        Recipient = to.split(";");
+
         /* Remove whitespace */
         Sender = from.trim();
-        Recipient = to.trim();
-        CC = cc.trim();
+        for (String rec : Recipient) {
+            rec = rec.trim();
+        }
+        if (hasCc) {
+            for (String c : Cc) {
+                c = c.trim();
+            }
+        }
 
+
+        // ADDED CC HEADER, MULTIPLE CCs and RECIPIENTS
         Headers = "From: " + Sender + CRLF;
-        Headers += "To: " + Recipient + CRLF;
-        Headers += "CC: " + CC + CRLF;
+
+        Headers += "To: " + Recipient[0];
+        for (int i = 1; i < Recipient.length; i++) {
+            Headers += " ," + Recipient[i];
+        }
+        Headers += CRLF;
+
+        if (hasCc) {
+            Headers += "Cc: " + Cc[0];
+            for (int i = 1; i < Cc.length; i++) {
+                Headers += " ," + Cc[i];
+            }
+            Headers += CRLF;
+        }
+
         Headers += "Subject: " + subject.trim() + CRLF;
 
         /*
@@ -74,33 +109,48 @@ public class EmailMessage {
     /*
      * Check whether the message is valid. In other words, check that both
      * sender and recipient contain only one @-sign.
+     * EXTRA - VALIDATE MULTIPLE RECEIPIENTS AND CCS
      */
     public boolean isValid() {
         int fromat = Sender.indexOf('@');
-        int toat = Recipient.indexOf('@');
-        int ccToat = CC.indexOf('@');
 
         if (fromat < 1 || (Sender.length() - fromat) <= 1) {
             System.out.println("Sender address is invalid");
-            return false;
-        }
-        if (toat < 1 || (Recipient.length() - toat) <= 1) {
-            System.out.println("Recipient address is invalid");
-            return false;
-        }
-        if (CC.length() > 0 && ccToat < 1 || (CC.length() - ccToat) <= 1) {
-            // If CC is not empty and it contains '@' symbol
-            System.out.println("CC address is invalid");
             return false;
         }
         if (fromat != Sender.lastIndexOf('@')) {
             System.out.println("Sender address is invalid");
             return false;
         }
-        if (toat != Recipient.lastIndexOf('@')) {
-            System.out.println("Recipient address is invalid");
-            return false;
+
+        for (String rec : Recipient) {
+            int toat = rec.indexOf('@');
+
+            if (toat < 1 || (rec.length() - toat) <= 1) {
+                System.out.println(rec + " is invalid");
+                return false;
+            }
+            if (toat != rec.lastIndexOf('@')) {
+                System.out.println(rec + " is invalid");
+                return false;
+            }
         }
+
+        if (hasCc) {
+            for (String c : Cc) {
+                int ccat = c.indexOf('@');
+
+                if (ccat < 1 || (c.length() - ccat) <= 1) {
+                    System.out.println(c + " is invalid");
+                    return false;
+                }
+                if (ccat != c.lastIndexOf('@')) {
+                    System.out.println(c + " is invalid");
+                    return false;
+                }
+            }
+        }
+
         return true;
     }
 

@@ -73,7 +73,15 @@ public class SMTPConnect {
 	   sendCommand() to do the dirty work. Do _not_ catch the
 	   exception thrown from sendCommand(). */
         sendCommand("MAIL FROM: " + mailmessage.Sender + CRLF, 250);
-        sendCommand("RCPT TO: " + mailmessage.Recipient + CRLF, 250);
+
+        for (String rec : mailmessage.Recipient) {
+            sendCommand("RCPT TO: " + rec + CRLF, 250);
+        }
+        if (mailmessage.hasCc) {
+            for (String c : mailmessage.Cc) {
+                sendCommand("RCPT TO: " + c + CRLF, 250);
+            }
+        }
         sendCommand("DATA" + CRLF, 354);
         sendCommand(mailmessage.Headers + CRLF +
                 mailmessage.Body + CRLF +
