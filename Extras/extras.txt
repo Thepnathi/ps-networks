@@ -12,6 +12,8 @@ How to Test
 1. Input additional email address inside the "Cc:" textfield.
 2. To add more email addresses, you must use ";" after each email address.
 3. Input the rest of the information and click send.
+4. The headers will include a Cc line with all the Cc emails.
+5. If no Cc is included, this feature is ignored, and no Cc header is created.
 
 -----------------------------------------------------------------------------
 
@@ -24,6 +26,8 @@ How to Test
 1. Input recipients email addresses inside the "To:" textfield.
 2. To add an more than one recipient email address, you must use ";" after each email address.
 3. Input the rest of the information textfield and click send.
+4. The headers will include all recipient email addresses.
+
 
 -----------------------------------------------------------------------------
 
@@ -34,7 +38,9 @@ and body information.
 
 How to Test
 
-1. Input the redirect URL inside the "HTTP://" textfield. An example of URL is - cgi.csc.liv.ac.uk/~gairing/COMP211/A1/redirect/
+1. Input the redirect URL inside the "HTTP://" textfield. An example of a URL that gives a 302 code is - cgi.csc.liv.ac.uk/~gairing/COMP211/A1/redirect/ . An example of one that gives a 301 code is cgi.csc.liv.ac.uk/~gairing
 2. Click the "GET" button to retrieve the inforamtion.
+3. The console will inform if a redirection happens, and will output the redirection URL.
+4. The GUI will update with the URL that was reached.
 
 -----------------------------------------------------------------------------
