@@ -1,0 +1,40 @@
+
+Extras Documentation
+
+-----------------------------------------------------------------------------
+
+Feature 1:  Email supports multiple CC
+
+The application allows the client to CC to multiple users.
+
+How to Test
+
+1. Input additional email address inside the "Cc:" textfield.
+2. To add more email addresses, you must use ";" after each email address.
+3. Input the rest of the information and click send.
+
+-----------------------------------------------------------------------------
+
+Feature 2:  Email supports multiple recipients
+
+The email allows the client to attached multiple recipients.
+
+How to Test
+
+1. Input recipients email addresses inside the "To:" textfield.
+2. To add an more than one recipient email address, you must use ";" after each email address.
+3. Input the rest of the information textfield and click send.
+
+-----------------------------------------------------------------------------
+
+Feature 3: HTTP Redirect
+
+You can redirect the message when the server replies with 301 or 302 status code. It will show the header
+and body information. 
+
+How to Test
+
+1. Input the redirect URL inside the "HTTP://" textfield. An example of URL is - cgi.csc.liv.ac.uk/~gairing/COMP211/A1/redirect/
+2. Click the "GET" button to retrieve the inforamtion.
+
+-----------------------------------------------------------------------------
