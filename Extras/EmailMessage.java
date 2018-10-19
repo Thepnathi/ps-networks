@@ -37,7 +37,7 @@ public class EmailMessage {
     public EmailMessage(String from, String to, String cc, String subject, String text,
                         String localServer, int localServerPort) throws UnknownHostException {
 
-        if (cc != null) {
+        if (cc != null && cc == "") {
             Cc = cc.split(";");
             hasCc = true;
         } else {
